@@ -12,7 +12,37 @@ from model import text_preprocess
 token = os.environ.get("GITUBCTOKEN2")
 # Github Enterprise with custom hostname
 g = Github(base_url="https://github.ubc.ca/api/v3", login_or_token=token)
-student_repos = g.search_repositories(query="students in:repo:owner/name+pushed>2020-02-09+user:MDS-2019-20")
+# select repos
+mds_2019_2020_repos = [
+    "mds-2019-20/DSCI_511_prog-dsci_students", 
+    "mds-2019-20/DSCI_521_platforms-dsci_students", 
+    "mds-2019-20/DSCI_542_comm-arg_students", 
+    "mds-2019-20/DSCI_551_stat-prob-dsci_students", 
+    "mds-2019-20/DSCI_512_alg-data-struct_students", 
+    "mds-2019-20/DSCI_523_data-wrangling_students", 
+    "mds-2019-20/DSCI_531_viz-1_students", 
+    "mds-2019-20/DSCI_552_stat-inf-1_students", 
+    "mds-2019-20/DSCI_571_sup-learn-1_students", 
+    "mds-2019-20/DSCI_561_regr-1_students", 
+    "mds-2019-20/DSCI_532_viz-2_students", 
+    "mds-2019-20/DSCI_513_database-data-retr_students", 
+    "mds-2019-20/DSCI_562_regr-2_students", 
+    "mds-2019-20/DSCI_573_feat-model-select_students", 
+    "mds-2019-20/DSCI_572_sup-learn-2_students", 
+    "mds-2019-20/DSCI_522_dsci-workflows_students", 
+    "mds-2019-20/DSCI_563_unsup-learn_students", 
+    "mds-2019-20/DSCI_524_collab-sw-dev_students", 
+    "mds-2019-20/DSCI_553_stat-inf-2_students", 
+    "mds-2019-20/DSCI_574_spat-temp-mod_students", 
+    "mds-2019-20/DSCI_575_adv-mach-learn_students", 
+    "mds-2019-20/DSCI_541_priv-eth-sec_students", 
+    "mds-2019-20/DSCI_525_web-cloud-comp_students", 
+    "mds-2019-20/DSCI_554_exper-causal-inf_students", 
+    "mds-2019-20/DSCI_591_capstone-proj_students"
+]
+# student_repos = g.search_repositories(query="students in:repo:owner/name+pushed>2020-02-09+user:MDS-2019-20")
+student_repos = [g.get_repo(i) for i in mds_2019_2020_repos]
+
 
 def refresh_data(max_repos):
 
@@ -24,9 +54,6 @@ def refresh_data(max_repos):
     count = 1
     for repo in student_repos:
         print(repo)
-        if "MDS-2019-20" not in repo.full_name:
-            print("Not MDS 2019-20")
-            continue
         contents = repo.get_contents("")
         while contents:
             file_content = contents.pop(0)
