@@ -59,7 +59,7 @@ def refresh_data(repo_list, max_repos=None):
 
     # Iterate through each repo, and each file to extract content
     count = 1
-    print_break("Getting content from each repo:")
+    print_break(f"Getting content for {len(repo_list)} repos:")
     for repo in repo_list:
         print(repo)
         contents = repo.get_contents("")
@@ -116,6 +116,6 @@ if __name__ == "__main__":
     g = Github(base_url="https://github.ubc.ca/api/v3", login_or_token=token)
     # get content
     student_repos = get_repos()
-    results = refresh_data(repo_list=student_repos, max_repos=2)
+    results = refresh_data(repo_list=student_repos, max_repos=None)
     df = content_processing(results)
     df.to_csv("data/2020-03-18_student-repos.csv", index=False)
