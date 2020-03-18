@@ -6,8 +6,8 @@ from collections import defaultdict
 import pandas as pd
 from github import Github, Organization
 
-from helpers import print_break
-from model import text_preprocess
+from src.helpers import print_break
+from src.model import text_preprocess
 
 
 def get_repos():
@@ -112,7 +112,7 @@ def content_processing(content_dict):
 
 if __name__ == "__main__":
     # Setup Github API
-    token = os.environ.get("GITUBCTOKEN2")
+    token = os.environ.get("GITUBCTOKEN_ubc_mds_search")
     g = Github(base_url="https://github.ubc.ca/api/v3", login_or_token=token)
     # get content
     student_repos = get_repos()
