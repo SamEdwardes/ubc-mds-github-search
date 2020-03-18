@@ -8,7 +8,7 @@ A tool for searching the UBC Masters of Data Science GitHub repository.
 
 #### Running everything
 
-To refresh data, create model, and run app enter into the command line:
+To refresh the data, create the model, and run the app enter into the command line:
 
 ```
 bash RUNALL.sh
