@@ -11,7 +11,7 @@ from dash.dependencies import Input, Output
 from src.dash_helper import generate_table, fix_url
 from src.model import cos_similarity, find_query_weights, most_similar
 
-df = pd.read_csv("data/2020-03-01_student-repos.csv")
+df = pd.read_csv("data/2020-03-18_student-repos.csv")
 tfid_vectorizer = pickle.load(open("data/model.pkl", "rb"))
 X_train_weights = scipy.sparse.load_npz('data/model_sparse_matrix.npz')
 
