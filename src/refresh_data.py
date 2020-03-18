@@ -6,8 +6,8 @@ from collections import defaultdict
 import pandas as pd
 from github import Github, Organization
 
-from src.helpers import print_break
-from src.model import text_preprocess
+from helpers import print_break
+from model import text_preprocess
 
 
 def get_repos():
@@ -118,4 +118,4 @@ if __name__ == "__main__":
     student_repos = get_repos()
     results = refresh_data(repo_list=student_repos, max_repos=None)
     df = content_processing(results)
-    df.to_csv("data/2020-03-18_student-repos.csv", index=False)
+    df.to_csv("data/student-repos.csv", index=False)

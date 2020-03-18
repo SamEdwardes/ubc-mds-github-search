@@ -2,7 +2,7 @@
 
 A tool for searching the UBC Masters of Data Science GitHub repository.
 
-![screenshot-of-app](https://i.imgur.com/gmV6lxd.png)
+![screenshot-of-app](https://imgur.com/VxdPOVl.png)
 
 ## How to use
 

@@ -1,4 +1,6 @@
-data/*
+data/model_sparse_matrix.npz
+data/model.pkl
+data/student-repos.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
