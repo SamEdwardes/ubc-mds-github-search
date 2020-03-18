@@ -2,12 +2,30 @@
 
 A tool for searching the UBC Masters of Data Science GitHub repository.
 
-To run app clone this repository and then enter into the command line:
+![screenshot-of-app](https://i.imgur.com/gmV6lxd.png)
+
+## How to use
+
+#### Running everything
+
+To refresh data, create model, and run app enter into the command line:
+
+```
+bash RUNALL.sh
+```
+
+Then open [http://0.0.0.0:5000/](http://0.0.0.0:5000/).
+
+Note that for the script to work you will need to create an environment variable named `GITUBCTOKEN_ubc_mds_search`. This is a GitHub API token so that python can access the correct GitHub repos. You can create one by visiting [https://github.ubc.ca/settings/tokens](https://github.ubc.ca/settings/tokens), and then clicking on **Generate new token**. You should grant the following permissions:
+
+![screenshot-token-permissions](https://imgur.com/k8vPMK0.png)
+
+#### Running the app only
+
+To just run the app enter the following into the command line:
 
 ```
 python app.py
 ```
 
 Then open [http://0.0.0.0:5000/](http://0.0.0.0:5000/).
-
-![screenshot](https://i.imgur.com/gmV6lxd.png)

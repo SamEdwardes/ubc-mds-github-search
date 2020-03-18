@@ -9,6 +9,8 @@ import scipy.sparse
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from src.helpers import print_break
+
 def text_preprocess(x):
     regex = re.compile('[^a-zA-Z ]')
     x = regex.sub('', x)
@@ -40,6 +42,7 @@ def most_similar(similarity_list, min_hits=4):
     return most_similar
 
 def update_model(X_train_path):
+    print_break("Updating model")
     df = pd.read_csv(X_train_path)
     X_train = df.loc[:,"content"]
 
@@ -48,6 +51,7 @@ def update_model(X_train_path):
     scipy.sparse.save_npz('data/model_sparse_matrix.npz', X_train_weights)
 
 def test_model(X_train_path):
+    print_break("Testing model")
     df = pd.read_csv(X_train_path)
     tfid_vectorizer = pickle.load(open("data/model.pkl", "rb"))
     X_train_weights = scipy.sparse.load_npz('data/model_sparse_matrix.npz')
@@ -61,5 +65,5 @@ def test_model(X_train_path):
     print(X_query_index)
 
 if __name__ == '__main__':
-    # update_model(X_train_path="data/2020-03-01_student-repos.csv")
-    test_model(X_train_path="data/2020-03-01_student-repos.csv")
+    update_model(X_train_path="data/2020-03-18_student-repos.csv")
+    test_model(X_train_path="data/2020-03-18_student-repos.csv")
