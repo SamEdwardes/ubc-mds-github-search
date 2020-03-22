@@ -4,9 +4,11 @@ dash-core-components==1.5.1
 dash-html-components==1.0.2
 dash-renderer==1.2.1
 dash-table==4.5.1
+nltk==3.4.5
 numpy==1.18.1
 pandas==1.0.1
 pickleshare==0.7.5
 pygithub==1.43.6
 scikit-learn==0.22.1
 scipy==1.4.1
+textblob==0.15.3
