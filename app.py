@@ -16,6 +16,10 @@ from src.model import cos_similarity, find_query_weights, most_similar
 df = pd.read_csv("data/student-repos.csv")
 tfid_vectorizer = pickle.load(open("data/model.pkl", "rb"))
 X_train_weights = scipy.sparse.load_npz('data/model_sparse_matrix.npz')
+# Open a file: file
+file = open('data/last_refresh_date.txt',mode='r')
+last_refresh_date = file.read()
+file.close()
 
 ###########################################
 # APP LAYOUT
@@ -99,11 +103,10 @@ collapse = html.Div(
 
 footer = dbc.Row([
     dbc.Col([
+        html.P("Search database last updated: " + last_refresh_date),
+        html.Br(),
+        html.A("GitHub repo", href="https://github.com/SamEdwardes/ubc-mds-github-search"),
         html.P("Created by Sam Edwardes")
-    ]),
-    dbc.Col([
-        html.A("https://github.com/SamEdwardes/ubc-mds-github-search", 
-               href="https://github.com/SamEdwardes/ubc-mds-github-search")
     ])
 ], align="start", justify="start")
 
