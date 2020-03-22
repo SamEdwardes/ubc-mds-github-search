@@ -11,7 +11,7 @@ A tool for searching the UBC Masters of Data Science GitHub repository.
 To refresh the data, create the model, and run the app enter into the command line:
 
 ```
-bash RUNALL.sh
+make all
 ```
 
 Then open [http://0.0.0.0:5000/](http://0.0.0.0:5000/).
