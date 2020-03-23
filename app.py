@@ -16,10 +16,9 @@ from src.model import cos_similarity, find_query_weights, most_similar
 df = pd.read_csv("data/student-repos.csv")
 tfid_vectorizer = pickle.load(open("data/model.pkl", "rb"))
 X_train_weights = scipy.sparse.load_npz('data/model_sparse_matrix.npz')
-# Open a file: file
-file = open('data/last_refresh_date.txt',mode='r')
-last_refresh_date = file.read()
-file.close()
+date_file = open('data/last_refresh_date.txt',mode='r')
+last_refresh_date = date_file.read()
+date_file.close()
 
 ###########################################
 # APP LAYOUT
@@ -38,6 +37,22 @@ colors = {
     "secondary": "#95a5a6"
 }
 
+# DROP DOWN ITEMS
+def create_dropdowns():
+    file_types = df["file_extension"].unique().tolist()
+    for i in range(0, len(file_types)-1):
+        if type(file_types[i]) is float:
+            file_types.pop(i)
+    file_types = sorted(file_types, key=str.casefold)
+    file_types = ["All"] + file_types
+    repo_list = ["All"] + df["repo_name"].unique().tolist()
+    out = {
+        "file_types": file_types,
+        "repo_list": repo_list
+    }
+    return out
+
+# APP LAYOUT
 app_navbar = dbc.Navbar(
     [
         html.A(
@@ -55,14 +70,6 @@ app_navbar = dbc.Navbar(
     dark=True,
 )
 
-file_types = df["file_extension"].unique().tolist()
-for i in range(0, len(file_types)-1):
-    if type(file_types[i]) is float:
-        file_types.pop(i)
-file_types = sorted(file_types, key=str.casefold)
-file_types = ["All"] + file_types
-repo_list = ["All"] + df["repo_name"].unique().tolist()
-
 app_search_filters = dbc.Row([
     dbc.Col([
         dcc.Slider(id="max_hits", min=1, max=20, step=1, value=5),
@@ -71,7 +78,7 @@ app_search_filters = dbc.Row([
     dbc.Col([
         dbc.Select(
             id="select_file_type", 
-            options=[{"label": file_type , "value": file_type} for file_type in file_types],
+            options=[{"label": file_type , "value": file_type} for file_type in create_dropdowns()["file_types"]],
             value="All" 
         ),
         dbc.Label("Narrow search to specific file_type")
@@ -79,14 +86,14 @@ app_search_filters = dbc.Row([
     dbc.Col([
         dbc.Select(
             id="select_repo", 
-            options=[{"label": repo , "value": repo} for repo in repo_list],
+            options=[{"label": repo , "value": repo} for repo in create_dropdowns()["repo_list"]],
             value="All"
         ),
         dbc.Label("Narrow search to specific repo")
-    ])
-], align="end")
+    ])], align="end"
+)
 
-collapse = html.Div(
+app_collapse = html.Div(
     [
         dbc.Button(
             "Query Filters",
@@ -101,15 +108,16 @@ collapse = html.Div(
     ]
 )
 
-footer = dbc.Row([
+app_footer = dbc.Row([
     dbc.Col([
         html.P("Search database last updated: " + last_refresh_date),
         html.Br(),
         html.A("GitHub repo", href="https://github.com/SamEdwardes/ubc-mds-github-search"),
-        html.P("Created by Sam Edwardes")
-    ])
-], align="start", justify="start")
-
+        html.P("Created by Sam Edwardes"),
+        html.Br(),
+        html.A("Icon my by Freepik from www.flaticon.com", href="https://www.flaticon.com/free-icon/seo_1055645?term=search&page=1&position=53")
+    ])], align="start", justify="start"
+)
 
 app_main_body = dbc.Container(dbc.Row([
     dbc.Col(html.Div([
@@ -125,18 +133,16 @@ app_main_body = dbc.Container(dbc.Row([
                   type="text", size="75", value=""),
         html.Br(),
         html.Br(),
-        collapse,
+        app_collapse,
         html.Br(),
         html.H5("Top hits"),
         html.Div(id="top_hits"),
         html.Br(),
         html.Hr(),
-        footer
+        app_footer
     ]), width=10)
 ]))
 
-
-# APP LAYOUT
 app.layout = html.Div([
     app_navbar,
     app_main_body,
