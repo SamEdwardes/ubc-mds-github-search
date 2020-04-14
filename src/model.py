@@ -25,6 +25,7 @@ def text_preprocess(x):
     str
         Preprocessed text data
     """
+    x = str(x)
     regex = re.compile('[^a-zA-Z ]')
     x = regex.sub('', x)
     x = ' '.join(x.split()) # remove all double or more white space
