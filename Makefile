@@ -17,7 +17,7 @@ deploy_heroku :
 deploy_heroku_refresh :
 	python src/refresh_data.py;     # get the latest data
 	python src/refresh_model.py;    # rebuild the model
-	echo |date > data/last_refresh_date.txt 
+	echo | date > data/last_refresh_date.txt 
 	heroku container:push web --app ubc-mds-github-search 
 	heroku container:release web --app ubc-mds-github-search
 
