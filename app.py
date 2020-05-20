@@ -84,6 +84,7 @@ app.layout = html.Div([
 # APP CALL BACKS
 #/////////////////////////////////////////////////////////////////////////////
 
+# Step 1: Perform the query and find the most similar results
 @app.callback(
     Output(component_id='query_results', component_property='children'),[
         Input(component_id='search_query', component_property='value')]
@@ -98,6 +99,7 @@ def perform_query(search_query):
     return df_out.to_json(orient='split')
 
 
+# Step 2: Create a dataframe out of the n most likely results
 @app.callback(
     Output(component_id='top_hits', component_property='children'),[
         Input(component_id='query_results', component_property='children'),
@@ -108,6 +110,12 @@ def perform_query(search_query):
 def update_top_hits(query_results, max_hits, selected_file_type, selected_repo):
     # get query results
     df_out = pd.read_json(query_results, orient='split')
+    
+    # return a placeholder if there is no search input
+    if df_out.shape[0] == 0:
+        df_out = df.copy()
+        df_out['score'] = np.NaN
+
     # filtering
     if selected_file_type == "All":
         df_out = df_out
@@ -136,6 +144,7 @@ def update_top_hits(query_results, max_hits, selected_file_type, selected_repo):
     return dbc.Table.from_dataframe(out, bordered=True, hover=True, striped=True)
 
 
+# Step 3: Create a plot of the most relevant subjects
 @app.callback(
     Output(component_id='query_plot_subject', component_property='children'),[
         Input(component_id='query_results', component_property='children')]
@@ -143,11 +152,19 @@ def update_top_hits(query_results, max_hits, selected_file_type, selected_repo):
 def update_plot_subject(query_results):
     # get query results
     df_out = pd.read_json(query_results, orient='split')
-    # cleaning df for viewing
-    df_out = df_out.query('score > 0')
-    df_out = df_out[['repo_name', 'score']].groupby('repo_name').agg('sum')
-    df_out = df_out.sort_values(by='score')
-    df_out = df_out.reset_index().tail(10)
+
+    # return a placeholder if there is no search input
+    if df_out.shape[0] == 0:
+        df_out = pd.DataFrame({
+            'repo_name': df['repo_name'].unique()
+        })
+        df_out['score'] = 1
+        df_out.reset_index().tail(10)
+    else:
+        df_out = df_out.query('score > 0')
+        df_out = df_out[['repo_name', 'score']].groupby('repo_name').agg('sum')
+        df_out = df_out.sort_values(by='score')
+        df_out = df_out.reset_index().tail(10)
     
     fig = px.bar(
         df_out,
@@ -163,6 +180,7 @@ def update_plot_subject(query_results):
     return dcc.Graph(id='plot', figure=fig)
 
 
+# Other callbacks
 @app.callback(
     Output("collapse", "is_open"),
     [Input("collapse-button", "n_clicks")],
