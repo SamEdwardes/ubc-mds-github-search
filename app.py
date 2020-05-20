@@ -1,10 +1,12 @@
 import os
 import pickle
 
+
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.express as px
 import pandas as pd
 import numpy as np
 import scipy.sparse
@@ -93,7 +95,7 @@ app_search_filters = dbc.Row([
     ])], align="end"
 )
 
-app_collapse = html.Div(
+app_collapse_query_filters = html.Div(
     [
         dbc.Button(
             "Query Filters",
@@ -119,6 +121,13 @@ app_footer = dbc.Row([
     ])], align="start", justify="start"
 )
 
+app_query_plots = dbc.Row([
+    dbc.Col([
+        html.H5('Query Results'),
+        html.Div(id='query_plot_subject')
+    ])
+])
+
 app_main_body = dbc.Container(dbc.Row([
     dbc.Col(html.Div([
         html.Br(),
@@ -133,10 +142,12 @@ app_main_body = dbc.Container(dbc.Row([
                   type="text", size="75", value=""),
         html.Br(),
         html.Br(),
-        app_collapse,
+        app_collapse_query_filters,
         html.Br(),
         html.H5("Top hits"),
         html.Div(id="top_hits"),
+        html.Br(),
+        app_query_plots,
         html.Br(),
         html.Hr(),
         app_footer
@@ -148,9 +159,9 @@ app.layout = html.Div([
     app_main_body,
 ])
 
-###########################################
+#/////////////////////////////////////////////////////////////////////////////
 # APP CALL BACKS
-###########################################
+#/////////////////////////////////////////////////////////////////////////////
 
 @app.callback(
     Output(component_id='top_hits', component_property='children'),[
@@ -195,6 +206,37 @@ def update_top_hits(search_query, max_hits, selected_file_type, selected_repo):
 
 
 @app.callback(
+    Output(component_id='query_plot_subject', component_property='children'),[
+        Input(component_id='search_query', component_property='value')
+    ]
+)
+def update_plot_subject(search_query):
+    # find most relevant panges
+    X_query_weights = find_query_weights(search_query, tfid_vectorizer)
+    sim_list = cos_similarity(X_query_weights, X_train_weights)
+    df_out = df.copy()
+    df_out["score"] = sim_list
+    # cleaning df for viewing
+    df_out = df_out.query('score > 0')
+    df_out = df_out[['repo_name', 'score']].groupby('repo_name').agg('sum')
+    df_out = df_out.sort_values(by='score')
+    df_out = df_out.reset_index().tail(10)
+    
+    fig = px.bar(
+        df_out,
+        x='score',
+        y='repo_name',
+        orientation='h',
+        title='Most Relevant Repos'
+    )
+
+    fig.update_xaxes(title_text='Total Score')
+    fig.update_yaxes(title_text='')
+
+    return dcc.Graph(id='plot', figure=fig)
+
+
+@app.callback(
     Output("collapse", "is_open"),
     [Input("collapse-button", "n_clicks")],
     [State("collapse", "is_open")],
@@ -207,7 +249,7 @@ def toggle_collapse(n, is_open):
 
 if __name__ == '__main__':
     app.run_server(
-        debug=False,
+        debug=True,
         host="0.0.0.0",
         port=port
     )
