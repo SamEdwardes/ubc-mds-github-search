@@ -14,17 +14,18 @@ from dash.dependencies import Input, Output, State
 
 from src.dash_helper import generate_table, fix_url
 from src.model import cos_similarity, find_query_weights, most_similar
+from src.layouts import app_navbar, app_collapse_query_filters, app_footer
 
-df = pd.read_csv("data/student-repos.csv")
+cols_to_read = ['repo_name', 'repo_full_name', 'file_name', 'file_extension', 
+                'size', 'path', 'url', 'encoding']
+df = pd.read_csv("data/student-repos.csv", usecols=cols_to_read)
 tfid_vectorizer = pickle.load(open("data/model.pkl", "rb"))
 X_train_weights = scipy.sparse.load_npz('data/model_sparse_matrix.npz')
-date_file = open('data/last_refresh_date.txt',mode='r')
-last_refresh_date = date_file.read()
-date_file.close()
 
-###########################################
+
+#/////////////////////////////////////////////////////////////////////////////
 # APP LAYOUT
-###########################################
+#/////////////////////////////////////////////////////////////////////////////
 
 # COLOUR AND STYLE
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
@@ -39,91 +40,9 @@ colors = {
     "secondary": "#95a5a6"
 }
 
-# DROP DOWN ITEMS
-def create_dropdowns():
-    file_types = df["file_extension"].unique().tolist()
-    for i in range(0, len(file_types)-1):
-        if type(file_types[i]) is float:
-            file_types.pop(i)
-    file_types = sorted(file_types, key=str.casefold)
-    file_types = ["All"] + file_types
-    repo_list = ["All"] + df["repo_name"].unique().tolist()
-    out = {
-        "file_types": file_types,
-        "repo_list": repo_list
-    }
-    return out
-
-# APP LAYOUT
-app_navbar = dbc.Navbar(
-    [
-        html.A(
-            # Use row and col to control vertical alignment of logo / brand
-            dbc.Row(
-                [
-                    dbc.Col(dbc.NavbarBrand("UBC MDS GitHub Search", className="ml-2")),
-                ],
-                align="center",
-                no_gutters=True,
-            ),
-        ),
-    ],
-    color="primary",
-    dark=True,
-)
-
-app_search_filters = dbc.Row([
-    dbc.Col([
-        dcc.Slider(id="max_hits", min=1, max=20, step=1, value=5),
-        dbc.Label("Max number of hits")
-    ]),
-    dbc.Col([
-        dbc.Select(
-            id="select_file_type", 
-            options=[{"label": file_type , "value": file_type} for file_type in create_dropdowns()["file_types"]],
-            value="All" 
-        ),
-        dbc.Label("Narrow search to specific file_type")
-    ]),
-    dbc.Col([
-        dbc.Select(
-            id="select_repo", 
-            options=[{"label": repo , "value": repo} for repo in create_dropdowns()["repo_list"]],
-            value="All"
-        ),
-        dbc.Label("Narrow search to specific repo")
-    ])], align="end"
-)
-
-app_collapse_query_filters = html.Div(
-    [
-        dbc.Button(
-            "Query Filters",
-            id="collapse-button",
-            className="mb-3",
-            color="primary",
-        ),
-        dbc.Collapse(
-            app_search_filters,
-            id="collapse",
-        ),
-    ]
-)
-
-app_footer = dbc.Row([
-    dbc.Col([
-        html.P("Search database last updated: " + last_refresh_date),
-        html.Br(),
-        html.A("GitHub repo", href="https://github.com/SamEdwardes/ubc-mds-github-search"),
-        html.P("Created by Sam Edwardes"),
-        html.Br(),
-        html.A("Icon my by Freepik from www.flaticon.com", href="https://www.flaticon.com/free-icon/seo_1055645?term=search&page=1&position=53")
-    ])], align="start", justify="start"
-)
-
 app_query_plots = dbc.Row([
     dbc.Col([
-        html.H5('Query Results'),
+        html.H5('Summary'),
         html.Div(id='query_plot_subject')
     ])
 ])
@@ -142,7 +61,7 @@ app_main_body = dbc.Container(dbc.Row([
                   type="text", size="75", value=""),
         html.Br(),
         html.Br(),
-        app_collapse_query_filters,
+        app_collapse_query_filters(df),
         html.Br(),
         html.H5("Top hits"),
         html.Div(id="top_hits"),
@@ -150,12 +69,14 @@ app_main_body = dbc.Container(dbc.Row([
         app_query_plots,
         html.Br(),
         html.Hr(),
-        app_footer
+        app_footer(),
+        # Hidden div inside the app that stores the intermediate value
+        html.Div(id='query_results', style={'display': 'none'})
     ]), width=10)
 ]))
 
 app.layout = html.Div([
-    app_navbar,
+    app_navbar(),
     app_main_body,
 ])
 
@@ -164,19 +85,29 @@ app.layout = html.Div([
 #/////////////////////////////////////////////////////////////////////////////
 
 @app.callback(
-    Output(component_id='top_hits', component_property='children'),[
-        Input(component_id='search_query', component_property='value'),
-        Input(component_id='max_hits', component_property='value'),
-        Input(component_id='select_file_type', component_property='value'),
-        Input(component_id='select_repo', component_property='value')
-    ]
+    Output(component_id='query_results', component_property='children'),[
+        Input(component_id='search_query', component_property='value')]
 )
-def update_top_hits(search_query, max_hits, selected_file_type, selected_repo):
-    # find most relevant panges
+def perform_query(search_query):
     X_query_weights = find_query_weights(search_query, tfid_vectorizer)
     sim_list = cos_similarity(X_query_weights, X_train_weights)
     df_out = df.copy()
     df_out["score"] = sim_list
+    df_out = df_out.query('score > 0')
+
+    return df_out.to_json(orient='split')
+
+
+@app.callback(
+    Output(component_id='top_hits', component_property='children'),[
+        Input(component_id='query_results', component_property='children'),
+        Input(component_id='max_hits', component_property='value'),
+        Input(component_id='select_file_type', component_property='value'),
+        Input(component_id='select_repo', component_property='value')]
+)
+def update_top_hits(query_results, max_hits, selected_file_type, selected_repo):
+    # get query results
+    df_out = pd.read_json(query_results, orient='split')
     # filtering
     if selected_file_type == "All":
         df_out = df_out
@@ -192,7 +123,7 @@ def update_top_hits(search_query, max_hits, selected_file_type, selected_repo):
     out["size"] = (df_out["size"] * 1e-6).round(3) # convert bytes to megabytes
     out["url"] = out["url"].apply(fix_url)
     out["url"] = out["url"].apply(lambda x: html.A("link", href=x))
-    out = out.drop(columns=["content", "content_clean", "encoding", "repo_full_name"])
+    out = out.drop(columns=["encoding", "repo_full_name"])
     out = out.rename(columns={
         "repo_name": "Repo",
         "file_name": "File Name",
@@ -207,15 +138,11 @@ def update_top_hits(search_query, max_hits, selected_file_type, selected_repo):
 
 @app.callback(
     Output(component_id='query_plot_subject', component_property='children'),[
-        Input(component_id='search_query', component_property='value')
-    ]
+        Input(component_id='query_results', component_property='children')]
 )
-def update_plot_subject(search_query):
-    # find most relevant panges
-    X_query_weights = find_query_weights(search_query, tfid_vectorizer)
-    sim_list = cos_similarity(X_query_weights, X_train_weights)
-    df_out = df.copy()
-    df_out["score"] = sim_list
+def update_plot_subject(query_results):
+    # get query results
+    df_out = pd.read_json(query_results, orient='split')
     # cleaning df for viewing
     df_out = df_out.query('score > 0')
     df_out = df_out[['repo_name', 'score']].groupby('repo_name').agg('sum')
