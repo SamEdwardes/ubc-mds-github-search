@@ -1,0 +1,8 @@
+{
+    "python.linting.enabled": true,
+    "cSpell.enableFiletypes": [
+        "!python",
+        "rmd"
+    ],
+    "python.linting.flake8Enabled": true
+}
