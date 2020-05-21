@@ -6,6 +6,30 @@ date_file = open('data/last_refresh_date.txt',mode='r')
 last_refresh_date = date_file.read()
 date_file.close()
 
+##############################################################################
+# Helper functions
+##############################################################################
+
+def create_dropdowns(df):
+    file_types = df["file_extension"].unique().tolist()
+    for i in range(0, len(file_types)-1):
+        if type(file_types[i]) is float:
+            file_types.pop(i)
+    file_types = sorted(file_types, key=str.casefold)
+    file_types = ["All"] + file_types
+    repo_list = ["All"] + df["repo_name"].unique().tolist()
+    out = {
+        "file_types": file_types,
+        "repo_list": repo_list
+    }
+    return out
+
+
+##############################################################################
+# Layouts
+##############################################################################
+
+
 def app_navbar():
     layout = dbc.Navbar(
         [
@@ -24,21 +48,6 @@ def app_navbar():
         dark=True,
     )
     return layout
-
-
-def create_dropdowns(df):
-    file_types = df["file_extension"].unique().tolist()
-    for i in range(0, len(file_types)-1):
-        if type(file_types[i]) is float:
-            file_types.pop(i)
-    file_types = sorted(file_types, key=str.casefold)
-    file_types = ["All"] + file_types
-    repo_list = ["All"] + df["repo_name"].unique().tolist()
-    out = {
-        "file_types": file_types,
-        "repo_list": repo_list
-    }
-    return out
 
 
 def app_collapse_query_filters(df):
