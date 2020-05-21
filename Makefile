@@ -1,11 +1,13 @@
 all :
 	python src/refresh_data.py;     # get the latest data
 	python src/refresh_model.py;    # rebuild the model
+	echo | date > data/last_refresh_date.txt
 	python app.py                   # run the app
 
 refresh :
 	python src/refresh_data.py;     # get the latest data
 	python src/refresh_model.py;    # rebuild the model
+	echo | date > data/last_refresh_date.txt
 
 app :
 	python app.py                   # run the app
