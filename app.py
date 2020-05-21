@@ -56,7 +56,6 @@ app_main_body = dbc.Container(dbc.Row([
         html.Br(),
         welcome_text,
         html.Br(),
-        html.Br(),
         html.Label("Enter search term:"),
         html.Br(),
         dcc.Input(id="search_query", placeholder="e.g. maximum likelihood estimation", type="text", size="75", value=""),
@@ -153,7 +152,7 @@ def toggle_collapse(n, is_open):
 
 if __name__ == '__main__':
     app.run_server(
-        debug=True,
+        debug=False,
         host="0.0.0.0",
         port=port
     )
