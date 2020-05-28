@@ -88,7 +88,7 @@ def update_top_hits(query_results, max_hits, selected_file_type, selected_repo, 
     out["size"] = (df_out["size"] * 1e-6).round(3)  # convert bytes to megabytes
     out["url"] = out["url"].apply(fix_url)
     out['file_name'] = out['file_name'].apply(lambda x: x[0:25] + '...' + x[-25:] if len(x) > 50 else x)
-    out["file_name"] = out.apply(lambda x: html.A(x['file_name'], href=str(x['url'])), axis=1)
+    out["file_name"] = out.apply(lambda x: html.A(x['file_name'], href=str(x['url']), target='_blank'), axis=1)
     out = out.drop(columns=["encoding", "repo_full_name", 'path', 'url'])
     out = out.rename(columns={
         "repo_name": "Repo",

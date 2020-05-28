@@ -43,13 +43,16 @@ colors = {
 # APP LAYOUT
 ##############################################################################
 
-welcome_text = dcc.Markdown('''
-This app was created to help students from the University of British 
-Columbia [(UBC)](https://www.ubc.ca/) Master of Data Science 
-[(MDS)](https://masterdatascience.ubc.ca/) program find course content. 
-Anyone can use the app, but the links will only work for those who have access 
-to the [MDS GitHub repo](https://github.ubc.ca/).
-''')
+welcome_text = html.P([
+    'This app was created to help students from the University of British Columbia ',
+    html.A('(UBC)', href="https://www.ubc.ca/", target='_blank'),
+    ' Master of Data Science ',
+    html.A('(MDS)', href="https://masterdatascience.ubc.ca/", target='_blank'),
+    ' program to help find course conent.',
+    '  Anyone can use the app, but the links will only work for those who have access to the ',
+    html.A('MDS GitHub repo', href="https://github.ubc.ca/", target='_blank'),
+    '.'
+])
 
 app_main_body = dbc.Container(dbc.Row([
     dbc.Col(html.Div([
@@ -152,7 +155,7 @@ def toggle_collapse(n, is_open):
 
 if __name__ == '__main__':
     app.run_server(
-        debug=False,
+        debug=True,
         host="0.0.0.0",
         port=port
     )

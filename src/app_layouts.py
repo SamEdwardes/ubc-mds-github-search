@@ -164,11 +164,11 @@ def app_footer():
             html.B('Credits'),
             html.Br(),
             html.Br(),
-            html.Em(['Created by ', html.A('Sam Edwardes', href="https://github.com/SamEdwardes/ubc-mds-github-search")]),
+            html.Em(['Created by ', html.A('Sam Edwardes', href="https://github.com/SamEdwardes/ubc-mds-github-search", target='_blank')]),
             html.Br(),
-            html.Em(['Data from ', html.A('https://github.ubc.ca/', href="https://github.ubc.ca/")]),
+            html.Em(['Data from ', html.A('https://github.ubc.ca/', href="https://github.ubc.ca/", target='_blank')]),
             html.Br(),
-            html.Em(['Icon by Freepik from ', html.A("www.flaticon.com", href="https://www.flaticon.com/free-icon/seo_1055645?term=search&page=1&position=53")]),
+            html.Em(['Icon by Freepik from ', html.A("www.flaticon.com", href="https://www.flaticon.com/free-icon/seo_1055645?term=search&page=1&position=53", target='_blank')]),
             html.Br(),
             html.Br()
         ]),
@@ -178,9 +178,9 @@ def app_footer():
             html.Br(),
             html.Em("Last update: " + last_refresh_date),
             html.Br(),
-            html.Em(['Created using ', html.A('Plotly Dash', href="https://dash.plotly.com/")]),
+            html.Em(['Created using ', html.A('Plotly Dash', href="https://dash.plotly.com/", target='_blank')]),
             html.Br(),
-            html.Em(['Report a bug on ', html.A('GitHub Issues', href="https://github.com/SamEdwardes/ubc-mds-github-search/issues")]),
+            html.Em(['Report a bug on ', html.A('GitHub Issues', href="https://github.com/SamEdwardes/ubc-mds-github-search/issues", target='_blank')]),
             html.Br(),
             html.Br()
         ])], align="start", justify="start"
