@@ -5,7 +5,7 @@ dash-html-components==1.0.2
 dash-renderer==1.2.1
 dash-table==4.5.1
 nltk==3.4.5
-numpy==1.18.1
+numpy==1.22.0
 pandas==1.0.1
 plotly-express===0.4.1
 pickleshare==0.7.5
