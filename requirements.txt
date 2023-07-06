@@ -11,5 +11,5 @@ plotly-express===0.4.1
 pickleshare==0.7.5
 pygithub==1.43.6
 scikit-learn==0.22.1
-scipy==1.4.1
+scipy==1.10.0
 textblob==0.15.3
